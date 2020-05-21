@@ -55,6 +55,7 @@ $ docker run --name zabbix-agent \
  --or--
  
 $ docker run --name some-zabbix-agent --link some-zabbix-server:zabbix-server -d zabbix/zabbix-agent:latest
+$ docker run --name zabbix-agent --link zabbix-server-mysql:zabbix-server -d zabbix/zabbix-agent:centos-5.0-latest
 ```
 
 Continue troubleshooting at https://hub.docker.com/r/digiapulssi/docker-zabbix-agent/
