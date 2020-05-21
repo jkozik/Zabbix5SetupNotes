@@ -14,7 +14,7 @@ $ docker run --name zabbix-java-gateway -t \
       --restart unless-stopped \
       -d zabbix/zabbix-java-gateway:latest
       
-$     docker run --name zabbix-server-mysql -t \
+$ docker run --name zabbix-server-mysql -t \
       -e DB_SERVER_HOST="mysql-server" \
       -e MYSQL_DATABASE="zabbix" \
       -e MYSQL_USER="zabbix" \
