@@ -56,3 +56,6 @@ $ docker run --name zabbix-agent \
  
 $ docker run --name some-zabbix-agent --link some-zabbix-server:zabbix-server -d zabbix/zabbix-agent:latest
 ```
+
+Continue troubleshooting at https://hub.docker.com/r/digiapulssi/docker-zabbix-agent/
+
