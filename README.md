@@ -50,7 +50,7 @@ $ docker run --name some-zabbix-agent \
 $ docker run --name zabbix-agent \
        -e ZBX_HOSTNAME="linode2.kozik.net" \
        -e ZBX_SERVER_HOST="127.0.0.1" \
-       -d zabbix/zabbix-agent:tag
+       -d zabbix/zabbix-agent:centos-5.0-latest
  
  --or--
  
