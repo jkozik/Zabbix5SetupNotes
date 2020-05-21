@@ -42,5 +42,17 @@ $ docker run --name zabbix-web-apache-mysql -t \
 ```
 To be worked: zabbix-agent
 ```
-docker run --name some-zabbix-agent -e ZBX_HOSTNAME="some-hostname" -e ZBX_SERVER_HOST="some-zabbix-server" -d zabbix/zabbix-agent:tag
+$ docker run --name some-zabbix-agent \
+       -e ZBX_HOSTNAME="some-hostname" \
+       -e ZBX_SERVER_HOST="some-zabbix-server" \
+       -d zabbix/zabbix-agent:tag
+       
+$ docker run --name zabbix-agent \
+       -e ZBX_HOSTNAME="linode2.kozik.net" \
+       -e ZBX_SERVER_HOST="127.0.0.1" \
+       -d zabbix/zabbix-agent:tag
+ 
+ --or--
+ 
+$ docker run --name some-zabbix-agent --link some-zabbix-server:zabbix-server -d zabbix/zabbix-agent:latest
 ```
