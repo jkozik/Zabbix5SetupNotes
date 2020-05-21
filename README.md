@@ -56,7 +56,14 @@ $ docker run --name zabbix-agent \
  
 $ docker run --name some-zabbix-agent --link some-zabbix-server:zabbix-server -d zabbix/zabbix-agent:latest
 $ docker run --name zabbix-agent --link zabbix-server-mysql:zabbix-server -d zabbix/zabbix-agent:centos-5.0-latest
+$ docker container inspect zabbix-agent | grep IPAddress  # Get the IP Address of the zabbix-agent
+```
+From a web browser go to the zabbix web page: http://linode2.kozik.net. Login and go to the configuration for the Zabbix Server.  For interfaces/Agent field, enter the IP Address from above. Soon the ZBX icon should turn green.
+
+One can force the server configuration refresh by getting a bash prompt in the zabbix-server container and running a zabbix_server command.
+```
+$ docker exec -it zabbix-server /bin/bash
+  $ zabbix_server -R config_cache_reload
 ```
 
-Continue troubleshooting at https://hub.docker.com/r/digiapulssi/docker-zabbix-agent/
 
