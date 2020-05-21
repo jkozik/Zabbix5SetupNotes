@@ -40,3 +40,7 @@ $ docker run --name zabbix-web-apache-mysql -t \
       --restart unless-stopped \
       -d zabbix/zabbix-web-apache-mysql:latest
 ```
+To be worked: zabbix-agent
+```
+docker run --name some-zabbix-agent -e ZBX_HOSTNAME="some-hostname" -e ZBX_SERVER_HOST="some-zabbix-server" -d zabbix/zabbix-agent:tag
+```
