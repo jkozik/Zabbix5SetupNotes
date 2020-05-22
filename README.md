@@ -40,21 +40,8 @@ $ docker run --name zabbix-web-apache-mysql -t \
       --restart unless-stopped \
       -d zabbix/zabbix-web-apache-mysql:latest
 ```
-To be worked: zabbix-agent
+First, get the abbix-agent on the zabbix-server VM talking to each other. Note the docker run command uses the --link option. Useful link- https://blog.zabbix.com/zabbix-agent-active-vs-passive/9207/ 
 ```
-$ docker run --name some-zabbix-agent \
-       -e ZBX_HOSTNAME="some-hostname" \
-       -e ZBX_SERVER_HOST="some-zabbix-server" \
-       -d zabbix/zabbix-agent:tag
-       
-$ docker run --name zabbix-agent \
-       -e ZBX_HOSTNAME="linode2.kozik.net" \
-       -e ZBX_SERVER_HOST="127.0.0.1" \
-       -d zabbix/zabbix-agent:centos-5.0-latest
- 
- --or--
- 
-$ docker run --name some-zabbix-agent --link some-zabbix-server:zabbix-server -d zabbix/zabbix-agent:latest
 $ docker run --name zabbix-agent --link zabbix-server-mysql:zabbix-server -d zabbix/zabbix-agent:centos-5.0-latest
 $ docker container inspect zabbix-agent | grep IPAddress  # Get the IP Address of the zabbix-agent
 ```
@@ -65,5 +52,25 @@ One can force the server configuration refresh by getting a bash prompt in the z
 $ docker exec -it zabbix-server /bin/bash
   $ zabbix_server -R config_cache_reload
 ```
+Next step, get a zabbix-agent on another host talking to this zabbix-server.  My first host is a Centos 7 VM located on my home server. Note that I have an existing Zabbix infrastructure already in place, so I am using 10070-71 for ports, not the defaults. The following commands are run on that VM.
+```
+# VM - 192.168.100.178 (home LAN, behind firewall)  #-root, $-docker user
+# firewall-cmd --permanent --add-port=10070-10071/tcp
+# firewall-cmd --reload
+...
+$ docker run --name zabbix-agent -p 10070:10050 -e ZBX_SERVER_HOST="linode2.kozik.net" -e ZBX_SERVER_PORT="10070" -d zabbix/zabbix-agent:centos-5.0-latest
+$ docker logs -f zabbix-agent
+$ curl http://ipecho.net/plain  # what IP address does this server NATs to in the Internet <Agent IP Addr>
+```
+Next, go to the home router and open a NAT connection from the internet to 192.168.100.178:10070.  I don't show details of this here.  
+
+Next, verify that the plumbing is setup correctly.  Go back to the zabbix server container.  
+```
+# Zabbix Server VM
+$ docker exec -it zabbix-server-mysql /bin/bash
+  $ zabbix_get -s<Agent IP Addr> -p 10070 -k system.hostname
+```
+From a web browser go to the zabbix web page: http://linode2.kozik.net. Login and go to the configuration for the Zabbix Server. Add a new host using the <Agent IP Addr> as the IP address and host name with port 10070.  Use templates: Template OS Linux by Zabbix agent.  Wait awhile and verify that the ZBX icon turns green. 
+      
 
 
