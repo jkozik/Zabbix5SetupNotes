@@ -72,5 +72,17 @@ $ docker exec -it zabbix-server-mysql /bin/bash
 ```
 From a web browser go to the zabbix web page: http://linode2.kozik.net. Login and go to the configuration for the Zabbix Server. Add a new host using the <Agent IP Addr> as the IP address and host name with port 10070.  Use templates: Template OS Linux by Zabbix agent.  Wait awhile and verify that the ZBX icon turns green. 
       
+My zabbix-server was complaining about swap space size.  Here's what I did to fix the issue on my zabbix-server host root login.
+```
+# dd if=/dev/zero of=/newswap bs=1024 count=256000
+# chmod 600 /newswap
+# mkswap  /newswap
+# swapon /newswap
+# chmod 600 /newswap
+# free -h
+# vi /etc/fstab  # add "/newswap    swap    swap   defaults 0 0" at the bottom
+```
+
+      
 
 
