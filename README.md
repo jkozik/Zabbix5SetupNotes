@@ -62,6 +62,19 @@ $ docker run --name zabbix-agent -p 10070:10050 -e ZBX_SERVER_HOST="linode2.kozi
 $ docker logs -f zabbix-agent
 $ curl http://ipecho.net/plain  # what IP address does this server NATs to in the Internet <Agent IP Addr>
 ```
+Re-done but with a pre-shared key stored at /var/lib/zabbix/enc in the file zabbix_agentd.psk.  The same key needs to be put in the encryption tab of the host configuration. 
+```
+$ docker run --name zabbix-agent -p 10070:10050 
+   -v /var/lib/zabbix/enc:/var/lib/zabbix/enc 
+   -e ZBX_TLSPSKIDENTITY="PSK 001"  
+   -e ZBX_TLSPSKFILE=zabbix_agentd.psk  
+   -e ZBX_SERVER_HOST="linode2.kozik.net" 
+   -e ZBX_TLSCONNECT="psk" 
+   -e ZBX_TLSACCEPT="psk" 
+   -e ZBX_SERVER_PORT="10070" 
+   -d zabbix/zabbix-agent:centos-5.0-latest
+```
+
 Next, go to the home router and open a NAT connection from the internet to 192.168.100.178:10070.  I don't show details of this here.  
 
 Next, verify that the plumbing is setup correctly.  Go back to the zabbix server container.  
