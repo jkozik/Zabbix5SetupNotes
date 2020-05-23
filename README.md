@@ -40,7 +40,7 @@ $ docker run --name zabbix-web-apache-mysql -t \
       --restart unless-stopped \
       -d zabbix/zabbix-web-apache-mysql:latest
 ```
-First, get the abbix-agent on the zabbix-server VM talking to each other. Note the docker run command uses the --link option. Useful link- https://blog.zabbix.com/zabbix-agent-active-vs-passive/9207/ 
+First, get the abbix-agent on the zabbix-server VM talking to each other. Note the docker run command uses the --link option. Useful link- https://blog.zabbix.com/zabbix-agent-active-vs-passive/9207/ and https://hub.docker.com/r/zabbix/zabbix-agent
 ```
 $ docker run --name zabbix-agent --link zabbix-server-mysql:zabbix-server -d zabbix/zabbix-agent:centos-5.0-latest
 $ docker container inspect zabbix-agent | grep IPAddress  # Get the IP Address of the zabbix-agent
@@ -52,7 +52,7 @@ One can force the server configuration refresh by getting a bash prompt in the z
 $ docker exec -it zabbix-server /bin/bash
   $ zabbix_server -R config_cache_reload
 ```
-Next step, get a zabbix-agent on another host talking to this zabbix-server.  My first host is a Centos 7 VM located on my home server. Note that I have an existing Zabbix infrastructure already in place, so I am using 10070-71 for ports, not the defaults. The following commands are run on that VM.
+Next step, get a zabbix-agent on another host talking to this zabbix-server.  My first host is a Centos 7 VM located on my home server. Note that I have an existing Zabbix infrastructure already in place, so I am using 10070-71 for ports, not the defaults. This sets up an agent in passive mode; that is, the zabbix-sever polls the agent and thus the incoming ports need to be opened. The following commands are run on that VM.
 ```
 # VM - 192.168.100.178 (home LAN, behind firewall)  #-root, $-docker user
 # firewall-cmd --permanent --add-port=10070-10071/tcp
@@ -82,7 +82,14 @@ My zabbix-server was complaining about swap space size.  Here's what I did to fi
 # free -h
 # vi /etc/fstab  # add "/newswap    swap    swap   defaults 0 0" at the bottom
 ```
+Next, I want to setup another zabbix-agent, but on an Alpine VM.  This one is setup in Active mode; that is, the zabbix-server waits for the agent to report to it.  No firewall ports need to be open. On my home LAN, this VM is 192.168.100.177. Running in a docker user account I did the following:
+```
+# VM - 192.168.100.177 Alpine Linux (home LAN, behind firewall)
+$ docker run --name zabbix-agent -e ZBX_ACTIVESERVERS="linode2.kozik.net"  -e ZBX_HOSTNAME="Alpine178" -d zabbix/zabbix-agent:alpine-5.0-latest
+$ 
+$ docker logs -f zabbix-agent
 
-      
+```
+From a web browser go to the zabbix web page: http://linode2.kozik.net. Login and go to the configuration for the Zabbix Server. Add a new host using the hostname as above (Alpine178) and the IP address of 0.0.0.0; you must select a template geared for active zabbix agents.  In this case, I selected the template "Template OS Linux by Zabbix agent active".    For me the ZBX icon didn't turn green, but I was seeing data collected right away.  
 
 
