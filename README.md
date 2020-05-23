@@ -82,14 +82,30 @@ My zabbix-server was complaining about swap space size.  Here's what I did to fi
 # free -h
 # vi /etc/fstab  # add "/newswap    swap    swap   defaults 0 0" at the bottom
 ```
-Next, I want to setup another zabbix-agent, but on an Alpine VM.  This one is setup in Active mode; that is, the zabbix-server waits for the agent to report to it.  No firewall ports need to be open. On my home LAN, this VM is 192.168.100.177. Running in a docker user account I did the following:
+On my home server install a zabbix-agent. This one is setup in Active mode; that is, the zabbix-server waits for the agent to report to it.  No firewall ports need to be open. On my home LAN, this VM is 192.168.100.177. Running in a docker user account I did the following:
 ```
 # VM - 192.168.100.177 Alpine Linux (home LAN, behind firewall)
-$ docker run --name zabbix-agent -e ZBX_ACTIVESERVERS="linode2.kozik.net"  -e ZBX_HOSTNAME="Alpine178" -d zabbix/zabbix-agent:alpine-5.0-latest
+$ docker run --name zabbix-agent -e ZBX_ACTIVESERVERS="linode2.kozik.net"  \
+   -e ZBX_HOSTNAME="Alpine178" \
+   -d zabbix/zabbix-agent:alpine-5.0-latest
 $ 
 $ docker logs -f zabbix-agent
 
 ```
 From a web browser go to the zabbix web page: http://linode2.kozik.net. Login and go to the configuration for the Zabbix Server. Add a new host using the hostname as above (Alpine178) and the IP address of 0.0.0.0; you must select a template geared for active zabbix agents.  In this case, I selected the template "Template OS Linux by Zabbix agent active".    For me the ZBX icon didn't turn green, but I was seeing data collected right away.  
+
+Next, it is useful to verify that active agent autoregistration works.  First, on the zabbix-server, go to Configuration → Actions, select Autoregistration as the event source and click on Create action an action called "Linux Host Autoregistration" that registers the host and adds a "Template OS Linux by Zabbix agent active" template.  Also set it up to check for a preshared key in the HostMetaData field. See https://www.zabbix.com/documentation/current/manual/discovery/auto_registration
+
+On the host (back on the VM 177), reinstall the zabbix-agent as follows:
+```
+# VM - 192.168.100.177 Alpine Linux (home LAN, behind firewall)
+$ docker stop zabbix-agent;docker rm zabbix-agent
+$ docker run --name zabbix-agent -e ZBX_ACTIVESERVERS="linode2.kozik.net" \
+      -e ZBX_HOSTNAME="Alpine177" 
+      -e ZBX_METADATA="Linux VM 71269fe72952ad5b56017c8aab3368191e283935756959e60f1047fc2cc2e6ad" \
+      -d zabbix/zabbix-agent:alpine-5.0-latest
+$ docker logs -f zabbix-agent
+'''
+On the zabbix-server host Alpine177 will appear shortly.
 
 
