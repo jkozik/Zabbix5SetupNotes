@@ -67,7 +67,7 @@ $ docker run --name zabbix-agent \
 $ docker logs -f zabbix-agent
 $ curl http://ipecho.net/plain  # what IP address does this server NATs to in the Internet <Agent IP Addr>
 ```
-###... with Pre Shared Keys
+### with Pre Shared Keys
 Re-done but with a pre-shared key stored at /var/lib/zabbix/enc in the file zabbix_agentd.psk.  The same key needs to be put in the encryption tab of the host configuration. 
 ```
 $ docker run --name zabbix-agent -p 10070:10050 
@@ -88,7 +88,7 @@ Next, verify that the plumbing is setup correctly.  Go back to the zabbix server
 $ docker exec -it zabbix-server-mysql /bin/bash
   $ zabbix_get -s<Agent IP Addr> -p 10070 -k system.hostname
 ```
-### At Zabbix portal configure new passive host\
+### At Zabbix portal configure new passive host
 From a web browser go to the zabbix web page: http://linode2.kozik.net. Login and go to the configuration for the Zabbix Server. Add a new host using the <Agent IP Addr> as the IP address and host name with port 10070.  Use templates: *Template OS Linux by Zabbix agent*.  Wait awhile and verify that the ZBX icon turns green. 
       
 My zabbix-server was complaining about swap space size.  Here's what I did to fix the issue on my zabbix-server host root login.
