@@ -59,10 +59,15 @@ Next step, get a zabbix-agent on another host talking to this zabbix-server.  My
 # firewall-cmd --permanent --add-port=10070-10071/tcp
 # firewall-cmd --reload
 ...
-$ docker run --name zabbix-agent -p 10070:10050 -e ZBX_SERVER_HOST="linode2.kozik.net" -e ZBX_SERVER_PORT="10070" -d zabbix/zabbix-agent:centos-5.0-latest
+$ docker run --name zabbix-agent \
+         -p 10070:10050 \
+         -e ZBX_SERVER_HOST="linode2.kozik.net" \
+         -e ZBX_SERVER_PORT="10070" \
+         -d zabbix/zabbix-agent:centos-5.0-latest
 $ docker logs -f zabbix-agent
 $ curl http://ipecho.net/plain  # what IP address does this server NATs to in the Internet <Agent IP Addr>
 ```
+###... with Pre Shared Keys
 Re-done but with a pre-shared key stored at /var/lib/zabbix/enc in the file zabbix_agentd.psk.  The same key needs to be put in the encryption tab of the host configuration. 
 ```
 $ docker run --name zabbix-agent -p 10070:10050 
@@ -83,6 +88,7 @@ Next, verify that the plumbing is setup correctly.  Go back to the zabbix server
 $ docker exec -it zabbix-server-mysql /bin/bash
   $ zabbix_get -s<Agent IP Addr> -p 10070 -k system.hostname
 ```
+### At Zabbix portal configure new passive host\
 From a web browser go to the zabbix web page: http://linode2.kozik.net. Login and go to the configuration for the Zabbix Server. Add a new host using the <Agent IP Addr> as the IP address and host name with port 10070.  Use templates: *Template OS Linux by Zabbix agent*.  Wait awhile and verify that the ZBX icon turns green. 
       
 My zabbix-server was complaining about swap space size.  Here's what I did to fix the issue on my zabbix-server host root login.
@@ -108,6 +114,7 @@ $ docker logs -f zabbix-agent
 ```
 From a web browser go to the zabbix web page: http://linode2.kozik.net. Login and go to the configuration for the Zabbix Server. Add a new host using the hostname as above (Alpine178) and the IP address of 0.0.0.0; you must select a template geared for active zabbix agents.  In this case, I selected the template "Template OS Linux by Zabbix agent active".    For me the ZBX icon didn't turn green, but I was seeing data collected right away.  
 
+### Active Agent Autoregistration
 Next, it is useful to verify that active agent autoregistration works.  First, on the zabbix-server, go to Configuration → Actions, select Autoregistration as the event source and click on Create action an action called "Linux Host Autoregistration" that registers the host and adds a "Template OS Linux by Zabbix agent active" template.  Also set it up to check for a preshared key in the HostMetaData field. See https://www.zabbix.com/documentation/current/manual/discovery/auto_registration
 
 On the host (back on the VM 177), reinstall the zabbix-agent as follows:
