@@ -5,3 +5,13 @@ Reference https://wiki.alpinelinux.org/wiki/Setting_up_Zabbix
 ```
 # vi /etc/groups    # edit to include zabbix "readproc:x:30:zabbix"
 # apk add zabbix-agent
+# cat 
+
+# cat >> /etc/zabbix/zabbix_agentd.conf <<EOL
+ServerActive="linode2.kozik.net"
+Hostname="Alpine177"
+HostMetadata="Linux VM 71269fe72952ad5b56017c8aab3368191e283935756959e60f1047fc2cc2e6ad"
+EOL
+
+# rc-update add zabbix-agentd
+# /etc/init.d/zabbix-agentd start
