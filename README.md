@@ -1,6 +1,6 @@
 # Zabbix 5.0 Setup Notes
 ## Zabbix Server setup using docker
-Follow instructions at https://www.zabbix.com/documentation/current/manual/installation/containers.
+The server that runs my Zabbix server is called linode2.kozik.net.  On it, I install a zabbix-server.  Because the it is runnong on a host and all hosts require an agent, I also install a zabbix server.  The zabbix-server keeps a deep time series data base in mysql; I install that too.  Follow instructions at https://www.zabbix.com/documentation/current/manual/installation/containers.
 ```
 $ docker run --name mysql-server -t \
       -e MYSQL_DATABASE="zabbix" \
@@ -45,7 +45,7 @@ Next, on the same host as the zabbix-server, install a zabbix-agent and link it 
 $ docker run --name zabbix-agent --link zabbix-server-mysql:zabbix-server -d zabbix/zabbix-agent:centos-5.0-latest
 $ docker container inspect zabbix-agent | grep IPAddress  # Get the IP Address of the zabbix-agent
 ```
-From a web browser go to the zabbix web page: http://linode2.kozik.net. Login and go to the configuration for the Zabbix Server.  For interfaces/Agent field, enter the IP Address from above. Soon the ZBX icon should turn green.
+From a web browser go to the zabbix web page: http://linode2.kozik.net. Login with the default username/password and go to the configuration for the Zabbix Server.  Add a new host; for its interfaces/Agent field, enter the IP Address from above. Soon the ZBX icon should turn green.
 
 One can force the server configuration refresh by getting a bash prompt in the zabbix-server container and running a zabbix_server command.
 ```
