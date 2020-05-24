@@ -1,0 +1,7 @@
+# Setup Zabbix Agent from Packages
+## Alpine Linux
+### Active Agent w/PSK
+Reference https://wiki.alpinelinux.org/wiki/Setting_up_Zabbix
+```
+# vi /etc/groups    # edit to include zabbix "readproc:x:30:zabbix"
+# apk add zabbix-agent
