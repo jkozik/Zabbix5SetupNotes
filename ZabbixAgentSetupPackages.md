@@ -54,7 +54,7 @@ Port-10080     # in my case, I already have zabbix installed, and am using non 1
 
 
 ## Centos 7 Agent Setup
-Reference https://tecadmin.net/install-zabbix-agent-on-centos-rhel/
+Reference https://tecadmin.net/install-zabbix-agent-on-centos-rhel/ and https://kifarunix.com/install-zabbix-agent-on-centos-7-for-zabbix-monitoring/
 ### Active Agent w/PSK
 ```
 # rpm -Uvh https://repo.zabbix.com/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-2.el7.noarch.rpm
