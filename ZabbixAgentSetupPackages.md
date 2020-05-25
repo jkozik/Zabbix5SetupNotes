@@ -71,5 +71,38 @@ EOL
 ```
 The zabbix-server Configuration->Hosts should soon show Centos7-178. Note: In the zabbix-server setup, I put an Action to detect the HostMetadata above. (Configuration->Actions->Autoregistration actions)
 
+### Passive Agent w/PSK
+1-First shut off the zabbix-agent.
+```
+# systemctl stop zabbix-agent
+```
+2-Remove host Centos7-178. Go to the zabbix web page http://linode2.kozik.net and remove the host Centos7-178. (Configuration->Hosts->Centos7-178, Delete) 
+3-Reconfigure agent for passive. Assume zabbix-agent is already installed.  Go into /etc/zabbix/zabbix_agentd.conf, clean out the parameters that were appended for last step. And append a new set of parameters.
+```
+# vi /etc/zabbix/zabbix_agentd.conf     # clear out the old parameters at the tail of the file
+# cat >> /etc/zabbix/zabbix_agentd.conf <<EOL
+Server=linode2.kozik.net
+ListenPort=10070      
+TLSConnect=psk
+TLSAccept=psk
+TLSPSKIdentity=PSK 001
+TLSPSKFile=/etc/zabbix/zabbix_agentd.psk
+EOL
+# cat >> /etc/zabbix/zabbix_agentd.psk <<EOL
+71269fe72952ad5b56017c8aab3368191e283935756959e60f1047fc2cc2e6ad
+EOL
+# service zabbix-agentd restart
+# curl http://ipecho.net/plain    # This is the IP Address on the other side of our home LAN NAT.  <IP Addr>
+```
+4-Add host Alpine 177. Unlike the active agent, passive agents must be manually added into the zabbix-server.  Surf to http://linode2.kozik.net, Configuration->Hosts->Create Hosts. 
+```
+Hostname-Centos7-178 
+IP-<IP Addr>
+Port-10070     # in my case, I already have zabbix installed, and am using non 10050 ports for setup and testing
+```
+5-Last step, go into the home router and setup a NAT between <IP Addr> and zabbix-agent's IP address, port 10070:10070. 
+6-Verify.  The log files on the zabbix-server and zabbix-agent should be checked.  In a few minutes the ZBX icon next to the Centos7-178 host on zabbix-server should turn green.
+
+
 
 
