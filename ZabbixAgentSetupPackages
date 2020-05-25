@@ -17,5 +17,5 @@ EOL
 # service zabbix-agentd restart
 ```
 I had troubles where a syntax error in my zabbix_agentd.conf silently failed.  I had to run the zabbix_agentd in command line mode to find the error.
-```
+
 
