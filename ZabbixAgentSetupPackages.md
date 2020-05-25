@@ -48,6 +48,8 @@ EOL
 Hostname-Alpine177 
 IP-<IP Addr>
 Port-10080     # in my case, I already have zabbix installed, and am using non 10050 ports for setup and testing
+Template-Template OS Linux by Zabbix agent
+PSK and PSK ID
 ```
 5-Last step, go into the home router and setup a NAT between <IP Addr> and zabbix-agent's IP address, port 10080:10080. 
 6-Verify.  The log files on the zabbix-server and zabbix-agent should be checked.  In a few minutes the ZBX icon next to the Alpine177 host on zabbix-server should turn green.
@@ -99,6 +101,8 @@ EOL
 Hostname-Centos7-178 
 IP-<IP Addr>
 Port-10070     # in my case, I already have zabbix installed, and am using non 10050 ports for setup and testing
+Template-Template OS Linux by Zabbix agent
+PSK and PSK ID
 ```
 5-Last step, go into the home router and setup a NAT between <IP Addr> and zabbix-agent's IP address, port 10070:10070. 
 6-Verify.  The log files on the zabbix-server and zabbix-agent should be checked.  In a few minutes the ZBX icon next to the Centos7-178 host on zabbix-server should turn green.
