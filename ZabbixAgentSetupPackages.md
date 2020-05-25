@@ -18,7 +18,7 @@ EOL
 # tail -f /var/log/zabbix/zabbix_agentd.log
 ```
 I had troubles where a syntax error in my zabbix_agentd.conf silently failed.  I had to run the zabbix_agentd in command line mode to find the error.
-On the zabbix server, the host Alpine auto registers nicely.  After a few minutes, the agent sends data to the server and displays nicely.
+On the zabbix server, the host Alpine auto registers nicely.  After a few minutes, the agent sends data to the server and displays host details nicely. Note: In the zabbix-server setup, I put an Action to detect the HostMetadata above. (Configuration->Actions->Autoregistration actions)
 
 ### Passive Agent w/PSK
 1-First shut off the zabbix-agent.
@@ -69,7 +69,7 @@ EOL
 # systemctl status zabbix-agent      # Verify 
 # netstat -lntp     # Verify
 ```
-
+The zabbix-server Configuration->Hosts should soon show Centos7-178. Note: In the zabbix-server setup, I put an Action to detect the HostMetadata above. (Configuration->Actions->Autoregistration actions)
 
 
 
