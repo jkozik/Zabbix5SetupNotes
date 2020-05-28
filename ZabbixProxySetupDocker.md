@@ -19,7 +19,7 @@ docker run --name zabbix-proxy-mysql -p 10060:10050  \
    -e ZBX_HOSTNAME=Dell2Proxy176 \
    -e ZBX_SERVER_HOST=linode2.kozik.net \
    -e ZBX_TLSPSKIDENTITY="PSK 001"  \
-   -v /var/lib/zabbix/enc:/var/lib/zabbix/enc
+   -v /var/lib/zabbix/enc:/var/lib/zabbix/enc \
    -e ZBX_TLSPSKFILE=zabbix_agentd.psk   \
    -e ZBX_SERVER_HOST="linode2.kozik.net"  \
    -e ZBX_TLSCONNECT="psk" \
