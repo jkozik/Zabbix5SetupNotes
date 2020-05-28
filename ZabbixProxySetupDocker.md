@@ -13,7 +13,18 @@ $ docker run --name zabbix-agent -p 10070:10050
 ```
 
 ```
-docker run --name zabbix-proxy-mysql -p 10060:10050  \
+$ docker run --name mysql-server -t \
+      -e MYSQL_DATABASE="zabbix" \
+      -e MYSQL_USER="zabbix" \
+      -e MYSQL_PASSWORD="zabbix_pwd" \
+      -e MYSQL_ROOT_PASSWORD="root_pwd" \
+      -d mysql:8.0.14 \
+      --character-set-server=utf8 --collation-server=utf8_bin \
+      --default-authentication-plugin=mysql_native_password
+
+
+
+$ docker run --name zabbix-proxy-mysql -p 10060:10050  \
    -e DB_SERVER_HOST="mysql-server" \
    -e MYSQL_USER="zabbixuser" -e MYSQL_PASSWORD="zabbixpw"  \
    -e ZBX_HOSTNAME=Dell2Proxy176 \
@@ -25,6 +36,7 @@ docker run --name zabbix-proxy-mysql -p 10060:10050  \
    -e ZBX_TLSCONNECT="psk" \
    -e ZBX_TLSACCEPT="psk" \
    -e ZBX_SERVER_PORT="10060" \
+   --link mysql-server:mysql \
    -d zabbix/zabbix-proxy-mysql:centos-5.0-latest
 ```
 
