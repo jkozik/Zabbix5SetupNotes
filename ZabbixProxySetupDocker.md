@@ -9,20 +9,20 @@ $ docker run --name mysql-server -t \
       -e MYSQL_USER="zabbix" \
       -e MYSQL_PASSWORD="zabbix_pwd" \
       -e MYSQL_ROOT_PASSWORD="root_pwd" \
-      -d mysql:8.0.14 \
+      -d mysql:8.0.18 \
       --character-set-server=utf8 --collation-server=utf8_bin \
       --default-authentication-plugin=mysql_native_password
 ```
 ## Install zabbix-proxy
 Again, following the same template as a zabbix-agent. Note that a zabbix_proxy.psk needs to be created and put in the correct host directory.
 ```
-$ docker run --name zabbix-proxy-mysql -p 10061:10061  \
+$ docker run --name zabbix-proxy-mysql -p 10050:10050  \
    -e DB_SERVER_HOST="mysql-server" \
    -e MYSQL_DATABASE="zabbix" \
    -e MYSQL_USER="zabbix" \
    -e MYSQL_PASSWORD="zabbix_pwd" \
    -e MYSQL_ROOT_PASSWORD="root_pwd" \
-   -e ZBX_HOSTNAME=Dell2Proxy176 \
+   -e ZBX_HOSTNAME=Dell2Proxy175 \
    -e ZBX_SERVER_HOST=linode2.kozik.net \
    -e ZBX_TLSPSKIDENTITY="PSK 001"  \
    -v /var/lib/zabbix/enc:/var/lib/zabbix/enc \
@@ -32,6 +32,7 @@ $ docker run --name zabbix-proxy-mysql -p 10061:10061  \
    -e ZBX_TLSACCEPT="psk" \
    --link mysql-server:mysql \
    -d zabbix/zabbix-proxy-mysql:centos-5.0-latest
+$ docker logs zabbix-proxy-mysql  # check that it connects with the mysql server and receives informatino from the zabbix server
 ```
 
 
