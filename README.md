@@ -42,10 +42,14 @@ $ docker run --name zabbix-web-apache-mysql -t \
 ```
 Next, on the same host as the zabbix-server, install a zabbix-agent and link it to the zabbix-server. Note the docker run command uses the --link option. Useful link- https://blog.zabbix.com/zabbix-agent-active-vs-passive/9207/ and https://hub.docker.com/r/zabbix/zabbix-agent
 ```
-$ docker run --name zabbix-agent --link zabbix-server-mysql:zabbix-server -d zabbix/zabbix-agent:centos-5.0-latest
+$ #OLD docker run --name zabbix-agent --link zabbix-server-mysql:zabbix-server -d zabbix/zabbix-agent:centos-5.0-latest
+$ docker run --name zabbix-agent 
+    --link zabbix-server-mysql:zabbix-server \
+    -e ZBX_HOSTNAME="Zabbix server" 
+    -d zabbix/zabbix-agent:centos-5.0-latest
 $ docker container inspect zabbix-agent | grep IPAddress  # Get the IP Address of the zabbix-agent
 ```
-From a web browser go to the zabbix web page: http://linode2.kozik.net. Login with the default username/password and go to the configuration for the Zabbix Server.  Add a new host; for its interfaces/Agent field, enter the IP Address from above. Soon the ZBX icon should turn green.
+From a web browser go to the zabbix web page: http://linode2.kozik.net. Login with the default username/password and go to the configuration for the Zabbix Server.  Add a new host; set the hostname to "Zabbix server" (no quotes); for its interfaces/Agent field, enter the IP Address from above. Soon the ZBX icon should turn green.
 
 One can force the server configuration refresh by getting a bash prompt in the zabbix-server container and running a zabbix_server command.
 ```
