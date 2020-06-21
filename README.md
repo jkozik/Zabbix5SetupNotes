@@ -22,6 +22,7 @@ $ docker run --name zabbix-server-mysql -t \
       -e MYSQL_PASSWORD="zabbix_pwd" \
       -e MYSQL_ROOT_PASSWORD="root_pwd" \
       -e ZBX_JAVAGATEWAY="zabbix-java-gateway" \
+      -e PHP_TZ=America/Chicago \
       --link mysql-server:mysql \
       --link zabbix-java-gateway:zabbix-java-gateway \
       -p 10051:10051 \
