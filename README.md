@@ -134,4 +134,21 @@ $ docker logs -f zabbix-agent
 '''
 On the zabbix-server host Alpine177 will appear shortly.
 
+# Restart
+Something I haven't figured out yet.  When my Linode VM running zabbix reboots, the zabbix containers do not cleanly restart.
+
+Thus, I have to manually sequence the restarting of the zabbix containers, as follows.
+```
+$ docker ps
+$ docker stop <any zabbix containers that might be running.
+$ docker ps -a     # verify that all the zabbix containers are still there, but stopped
+$ docker start mysql-server
+$ docker start zabbix-java-gateway
+$ docker start zabbix-server-mysql
+$ docker start zabbix-web-apache-mysql
+$ docker start zabbix-agent
+$ docker ps # verify that all the zabbix containers are running.
+```
+Should I be doing this in systemd?
+
 
