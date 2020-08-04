@@ -131,7 +131,7 @@ $ docker run --name zabbix-agent -e ZBX_ACTIVESERVERS="linode2.kozik.net" \
       -e ZBX_METADATA="Linux VM 71269fe72952ad5b56017c8aab3368191e283935756959e60f1047fc2cc2e6ad" \
       -d zabbix/zabbix-agent:alpine-5.0-latest
 $ docker logs -f zabbix-agent
-'''
+```
 On the zabbix-server host Alpine177 will appear shortly.
 
 # Restart
