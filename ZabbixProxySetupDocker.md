@@ -52,3 +52,19 @@ The above script creates a passive zabbix agent for this host.  Because it is pa
 
 On the zabbix-server front end web interface, this VM needs to be added as a new host, select a zabbix server passive template and use the public IP address.  The host needs to point to port 10090.
 
+## Restart after power outage
+I had a power outage.  The proxy server does not automatically come back.  I tried running the containers with the --restart unless-stopped option, but there's some dependencies in the sequence of restarting.  At some point, I will need to make a systemd-like script to force the restarting in a fixed order.  For now, the manual restarting works for me from the VM175 root login:
+```
+# docker start mysql-server
+# docker start zabbix-proxy-mysql
+# docker start zabbix-agent
+```
+It is good to verify that every thing looks normal by running a docker ps command:
+```
+# docker ps
+CONTAINER ID        IMAGE                                         COMMAND                  CREATED             STATUS              PORTS                                 NAMES
+d02bb433b604        zabbix/zabbix-agent:centos-5.0-latest         "/sbin/tini -- /usr/…"   9 months ago        Up 13 minutes       0.0.0.0:10090->10050/tcp              zabbix-agent
+362f516cd868        zabbix/zabbix-proxy-mysql:centos-5.0-latest   "/sbin/tini -- /usr/…"   9 months ago        Up 14 minutes       0.0.0.0:10050->10050/tcp, 10051/tcp   zabbix-proxy-mysql
+7cca3359d775        mysql:8.0.18                                  "docker-entrypoint.s…"   9 months ago        Up 14 minutes       3306/tcp, 33060/tcp                   mysql-server
+#
+```
