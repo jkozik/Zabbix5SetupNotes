@@ -151,4 +151,25 @@ $ docker ps # verify that all the zabbix containers are running.
 ```
 Should I be doing this in systemd?
 
+# Upgrade
+My first upgrade was from 5.0 to 5.2.  I couldn't find any guides for doing this upgrade.  The release documentation only shows the steps when upgrading from a yum-based packagtes environment.  See link https://www.zabbix.com/documentation/current/manual/installation/upgrade/packages/rhel_centos
+
+So I just followed what I thought was common sense docker best practice.  First I cloned my image.  I run my zabbix server on a Linode instance.  I ran the Linode "clone" procedure and created a backup image of everything.  Second, I stopped and deleted the key zabbix server containers:
+```
+$ docker stop zabbix-java-gateway zabbix-server-mysql zabbix-web-apache-mysql
+$ docker rm zabbix-java-gateway zabbix-server-mysql zabbix-web-apache-mysql
+```
+Next I re-ran the docker run commands (noted above) but with a centos-5.2-latest tag.  Here's an abreviated version of the command lines
+```
+$ docker run --name zabbix-java-gateway ... -d zabbix/zabbix-java-gateway:centos-5.2-latest
+$ docker run --name zabbix-server-mysql ... -d zabbix/zabbix-server-mysql:centos-5.2-latest
+$ docker run --name zabbix-web-apache-mysql ... -d zabbix/zabbix-web-apache-mysql:centos-5.2-latest
+```
+I then went over to the zabbix web interface and everything worked.  It made me reenter my username/password.
+
+Other things to do:  I need also to upgrade my proxy server and my agents.  
+
+
+docker stop 
+
 
