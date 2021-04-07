@@ -169,7 +169,6 @@ I then went over to the zabbix web interface and everything worked.  It made me 
 
 Other things to do:  I need also to upgrade my proxy server and my agents.  
 
-
-docker stop 
+Note:  I did not touch the mysql container.  I left it running.  I did not move to the new version of mysql... not needed, and not easy.  
 
 
