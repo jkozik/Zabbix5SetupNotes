@@ -171,4 +171,13 @@ Other things to do:  I need also to upgrade my proxy server and my agents.
 
 Note:  I did not touch the mysql container.  I left it running.  I did not move to the new version of mysql... not needed, and not easy.  
 
-
+# Agent 2
+I am trying to setup Zabbix Agent 2.  So far, running into issues with discovery of docker information.  Here's what I did to start:
+```
+$ docker run --name zabbix-agent \
+    --link zabbix-server-mysql:zabbix-server \
+    -e ZBX_HOSTNAME="Zabbix server" \
+    --privileged\
+    -d zabbix/zabbix-agent2:alpine-5.2-latest
+```
+My problem was the mysql container blew up with a 137 error.  Not sure how to fix.
