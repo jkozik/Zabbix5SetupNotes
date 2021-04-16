@@ -181,3 +181,20 @@ $ docker run --name zabbix-agent \
     -d zabbix/zabbix-agent2:alpine-5.2-latest
 ```
 My problem was the mysql container blew up with a 137 error.  Not sure how to fix.
+
+# cAdvisor
+To help me better troubleshoot my zabbix containers, I've installed cAdvisor.  I used the following run command that I found in the repository https://github.com/google/cadvisor/blob/master/docs/running.md
+Note: I picked the run command for Centos.
+```
+docker run \
+--volume=/:/rootfs:ro \
+--volume=/var/run:/var/run:rw \
+--volume=/sys/fs/cgroup/cpu,cpuacct:/sys/fs/cgroup/cpuacct,cpu \
+--volume=/var/lib/docker/:/var/lib/docker:ro \
+--publish=8080:8080 \
+--detach=true \
+--name=cadvisor \
+--privileged=true \
+google/cadvisor:latest
+```
+For my setup, I just accessed the link http://myzabbixserver.com:8080 and cAdvisor dashboard cameup, with no other setup required.
