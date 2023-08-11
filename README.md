@@ -198,3 +198,5 @@ docker run \
 google/cadvisor:latest
 ```
 For my setup, I just accessed the link http://myzabbixserver.com:8080 and cAdvisor dashboard cameup, with no other setup required.
+# Upgrade Zabbix 5.2 to 6.0 Setup Notes
+Just to be safe, I upgraded to 6.0 my setting a new VM on linode.  linode3.kozik.net. I started a new VM running Centos7 and installed Zabbix 6 on it using docker. 
