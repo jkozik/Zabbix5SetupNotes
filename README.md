@@ -200,3 +200,117 @@ google/cadvisor:latest
 For my setup, I just accessed the link http://myzabbixserver.com:8080 and cAdvisor dashboard cameup, with no other setup required.
 # Upgrade Zabbix 5.2 to 6.0 Setup Notes
 Just to be safe, I upgraded to 6.0 my setting a new VM on linode.  linode3.kozik.net. I started a new VM running Centos7 and installed Zabbix 6 on it using docker. 
+The upgrade process is simple:  
+-from the old VM copy the mysql database for 5.2 to the new VM
+-spin up mysql on the new VM and import the database
+-launch the Zabbix 6.0 containers 
+-review the log files to confirm the database was evolved to 6.0
+## Old VM.  Export Zabbix 5.2 database. Copy to new VM
+```
+[jkozik@linode2 ~]$ docker exec mysql-server /usr/bin/mysqldump -u zabbix  -pzabbix_pwd --all-databases --quick  > zabbix54_072523.sql
+mysqldump: [Warning] Using a password on the command line interface can be insecure.
+
+[jkozik@linode2 ~]$ ls -last
+total 499124
+498984 -rw-rw-r--.  1 jkozik jkozik 510958698 Aug 11 22:44 zabbix54_072523.sql
+
+[jkozik@linode2 ~]$ scp zabbix54_072523.sql  linode3.kozik.net:~jkozik/54.dmp
+jkozik@linode3.kozik.net's password:
+zabbix54_072523.sql                                                                                               100%  487MB  51.7MB/s   00:09
+[jkozik@linode2 ~]$
+```
+## New VM. Import Zabbix 5.2 database into new mysql container
+```
+docker volume create mysqldb
+docker volume ls
+docker network create --subnet 172.20.0.0/16 --ip-range 172.20.240.0/20 zabbix-net
+docker network ls
+
+docker run --name mysql-server -t \
+      -e MYSQL_DATABASE="zabbix" \
+      -e MYSQL_USER="zabbix" \
+      -e MYSQL_PASSWORD="zabbix_pwd" \
+      -e MYSQL_ROOT_PASSWORD="root_pwd" \
+      -v mysqldb:/var/lib/mysql \
+      --network=zabbix-net \
+      --restart unless-stopped \
+      -d mysql:8.0.34 \
+      --character-set-server=utf8 --collation-server=utf8_bin \
+      --default-authentication-plugin=mysql_native_password
+
+$ docker cp zabbix54_072523.sql mysql-server:/tmp
+Successfully copied 648MB to mysql-server:/tmp
+$ docker exec -it mysql-server /bin/bash
+bash-4.4# cd /tmp
+bash-4.4# ls
+zabbix54_072523.sql
+bash-4.4# exit
+exit
+
+$ docker exec -it mysql-server /bin/bash
+bash-4.4# mysql -uzabbix -p
+Enter password:
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+mysql> source /tmp/zabbix54_072523.sql
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> show databases
+    -> ;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| performance_schema |
+| zabbix             |
++--------------------+
+3 rows in set (0.02 sec)
+
+mysql> use information_schema
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables
+    -> ;
++---------------------------------------+
+| Tables_in_information_schema          |
++---------------------------------------+
+| ADMINISTRABLE_ROLE_AUTHORIZATIONS     |
+| APPLICABLE_ROLES                      |
+
+
+mysql> describe views;
++----------------------+---------------------------------+------+-----+---------+-------+
+| Field                | Type                            | Null | Key | Default | Extra |
++----------------------+---------------------------------+------+-----+---------+-------+
+| TABLE_CATALOG        | varchar(64)                     | NO   |     | NULL    |       |
+| TABLE_SCHEMA         | varchar(64)                     | NO   |     | NULL    |       |
+| TABLE_NAME           | varchar(64)                     | NO   |     | NULL    |       |
+| VIEW_DEFINITION      | longtext                        | YES  |     | NULL    |       |
+| CHECK_OPTION         | enum('NONE','LOCAL','CASCADED') | YES  |     | NULL    |       |
+| IS_UPDATABLE         | enum('NO','YES')                | YES  |     | NULL    |       |
+| DEFINER              | varchar(288)                    | YES  |     | NULL    |       |
+| SECURITY_TYPE        | varchar(7)                      | YES  |     | NULL    |       |
+| CHARACTER_SET_CLIENT | varchar(64)                     | NO   |     | NULL    |       |
+| COLLATION_CONNECTION | varchar(64)                     | NO   |     | NULL    |       |
++----------------------+---------------------------------+------+-----+---------+-------+
+10 rows in set (0.01 sec)
+
+mysql> exit
+
+$ docker volume inspect mysqldb
+[
+    {
+        "CreatedAt": "2023-07-26T02:23:57Z",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/mysqldb/_data",
+        "Name": "mysqldb",
+        "Options": null,
+        "Scope": "local"
+    }
+
+docker logs -f mysql-server
+
+```
+Note: I created a docker volume to store the mysql data.  This way the data will persist if mysql needs to be upgraded. I copied the exported data from the old VM into the new containers, and then I logged into mysql and imported the data using the source command.  I show and describe command to verify the basic structure is correct. This data is still in 5.x format.  When 6.0 starts, it will notice that and evolve the data forward.
