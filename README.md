@@ -205,6 +205,7 @@ The upgrade process is simple:
 -spin up mysql on the new VM and import the database
 -launch the Zabbix 6.0 containers 
 -review the log files to confirm the database was evolved to 6.0
+This just follows the [zabbix installation instructions for containers](https://www.zabbix.com/documentation/current/en/manual/installation/containers#examples)
 ## Old VM.  Export Zabbix 5.2 database. Copy to new VM
 ```
 [jkozik@linode2 ~]$ docker exec mysql-server /usr/bin/mysqldump -u zabbix  -pzabbix_pwd --all-databases --quick  > zabbix54_072523.sql
@@ -315,7 +316,7 @@ docker logs -f mysql-server
 ```
 Note: I created a docker volume to store the mysql data.  This way the data will persist if mysql needs to be upgraded. I copied the exported data from the old VM into the new containers, and then I logged into mysql and imported the data using the source command.  I show and describe command to verify the basic structure is correct. This data is still in 5.x format.  When 6.0 starts, it will notice that and evolve the data forward.
 
-Also note from the installation instructions, a global variable needs to be set before importing the zabbix database.
+Also note from the [installation instructions,](https://www.zabbix.com/documentation/current/en/manual/appendix/install/db_scripts#mysql)a global variable needs to be set before importing the zabbix database.
 ```
 [jkozik@linode3 ~]$ docker exec -it mysql-server /bin/bash
 bash-4.4# mysql -uroot -proot_pwd
