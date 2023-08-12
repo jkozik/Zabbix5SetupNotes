@@ -201,10 +201,10 @@ For my setup, I just accessed the link http://myzabbixserver.com:8080 and cAdvis
 # Upgrade Zabbix 5.2 to 6.0 Setup Notes
 Just to be safe, I upgraded to 6.0 my setting a new VM on linode.  linode3.kozik.net. I started a new VM running Centos7 and installed Zabbix 6 on it using docker. 
 The upgrade process is simple:  
--from the old VM copy the mysql database for 5.2 to the new VM
--spin up mysql on the new VM and import the database
--launch the Zabbix 6.0 containers 
--review the log files to confirm the database was evolved to 6.0
+1. from the old VM copy the mysql database for 5.2 to the new VM
+2. spin up mysql on the new VM and import the database
+3. launch the Zabbix 6.0 containers 
+4. review the log files to confirm the database was evolved to 6.0
 This just follows the [zabbix installation instructions for containers](https://www.zabbix.com/documentation/current/en/manual/installation/containers#examples)
 ## Old VM.  Export Zabbix 5.2 database. Copy to new VM
 ```
@@ -343,7 +343,7 @@ exit
 ```
 
 ## Create zabbix containers: zabbix-java-gateway, zabbix-server-mysql, zabbix-web-nginx-mysql
-Following the zabbix installation documentation, create the zabbix containers.
+Following the [zabbix installation instructions for containers](https://www.zabbix.com/documentation/current/en/manual/installation/containers#examples), create the zabbix containers.
 ```
 docker run --name zabbix-java-gateway -t \
       --restart unless-stopped \
