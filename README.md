@@ -402,4 +402,36 @@ docker run --name zabbix-agent -t \
 ```
 Note: In the Zabbix web client, the IP address of the Zabbix server is found with the inspection command, see above.
 
+## Troubleshooting tools: zabbix_get and tcpdump
+The docker container for the zabbix agent bundles zabbix_get.  Here's an example of querying a host with a pre-shared key from the zabbix server's agent container.
+```
+[jkozik@linode3 bin]$ docker exec -it zabbix-agent /bin/bash
+bash-4.4$ zabbix_get -s 73.73.67.228 -p 10060 -k system.hostname --tls-connect psk  --tls-psk-identity "PSK 001" --tls-psk-file /var/lib/zabbix/zabbix.psk
+dell1.kozik.net
+
+bash-4.4$ zabbix_get -s 73.73.67.228 -p 10060 -k system.sw.os --tls-connect psk  --tls-psk-identity "PSK 001" --tls-psk-file /var/lib/zabbix/zabbix.
+psk
+Linux version 3.10.0-1160.36.2.el7.x86_64 (mockbuild@kbuilder.bsys.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-44) (GCC) ) #1 SMP Wed Jul 21 11:57:15 UTC 2021
+bash-4.4$
+```
+Also, from the root account it is useful to look at the raw traffic from a host to the zabbix server using the tcpdump tool.
+```
+[root@linode3 ~]# tcpdump -ieth0 host dell1.kozik.net and port 10060 -c10 -nn
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+19:01:58.072588 IP 172.232.13.192.46982 > 73.73.67.228.10060: Flags [S], seq 2584394634, win 29200, options [mss 1460,sackOK,TS val 1607147931 ecr 0,nop,wscale 7], length 0
+19:01:58.083673 IP 73.73.67.228.10060 > 172.232.13.192.46982: Flags [S.], seq 2647721261, ack 2584394635, win 28960, options [mss 1460,sackOK,TS val 3895631272 ecr 1607147931,nop,wscale 7], length 0
+19:01:58.083712 IP 172.232.13.192.46982 > 73.73.67.228.10060: Flags [.], ack 1, win 229, options [nop,nop,TS val 1607147942 ecr 3895631272], length 0
+19:01:58.084090 IP 172.232.13.192.46982 > 73.73.67.228.10060: Flags [P.], seq 1:347, ack 1, win 229, options [nop,nop,TS val 1607147943 ecr 3895631272], length 346
+19:01:58.095276 IP 73.73.67.228.10060 > 172.232.13.192.46982: Flags [.], ack 347, win 235, options [nop,nop,TS val 3895631283 ecr 1607147943], length 0
+19:01:58.099949 IP 73.73.67.228.10060 > 172.232.13.192.46982: Flags [P.], seq 1:64, ack 347, win 235, options [nop,nop,TS val 3895631283 ecr 1607147943], length 63
+19:01:58.100086 IP 172.232.13.192.46982 > 73.73.67.228.10060: Flags [.], ack 64, win 229, options [nop,nop,TS val 1607147959 ecr 3895631283], length 0
+19:01:58.100474 IP 172.232.13.192.46982 > 73.73.67.228.10060: Flags [P.], seq 347:440, ack 64, win 229, options [nop,nop,TS val 1607147959 ecr 3895631283], length 93
+19:01:58.115721 IP 73.73.67.228.10060 > 172.232.13.192.46982: Flags [P.], seq 64:139, ack 440, win 235, options [nop,nop,TS val 3895631300 ecr 1607147959], length 75
+19:01:58.115958 IP 172.232.13.192.46982 > 73.73.67.228.10060: Flags [P.], seq 440:509, ack 139, win 229, options [nop,nop,TS val 1607147975 ecr 3895631300], length 69
+10 packets captured
+15 packets received by filter
+0 packets dropped by kernel
+[root@linode3 ~]#
+```
 
