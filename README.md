@@ -314,3 +314,44 @@ docker logs -f mysql-server
 
 ```
 Note: I created a docker volume to store the mysql data.  This way the data will persist if mysql needs to be upgraded. I copied the exported data from the old VM into the new containers, and then I logged into mysql and imported the data using the source command.  I show and describe command to verify the basic structure is correct. This data is still in 5.x format.  When 6.0 starts, it will notice that and evolve the data forward.
+## Create zabbix containers: zabbix-java-gateway, zabbix-server-mysql, zabbix-web-nginx-mysql
+Following the zabbix installation documentation, create the zabbix containers.
+```
+docker run --name zabbix-java-gateway -t \
+      --restart unless-stopped \
+      --network=zabbix-net \
+      -d zabbix/zabbix-java-gateway:alpine-6.0-latest
+
+
+docker run --name zabbix-server-mysql -t \
+      -e DB_SERVER_HOST="mysql-server" \
+      -e MYSQL_DATABASE="zabbix" \
+      -e MYSQL_USER="zabbix" \
+      -e MYSQL_PASSWORD="zabbix_pwd" \
+      -e MYSQL_ROOT_PASSWORD="root_pwd" \
+      -e ZBX_JAVAGATEWAY="zabbix-java-gateway" \
+      -e PHP_TZ=America/Chicago \
+      -p 10051:10051 \
+      --restart unless-stopped \
+      --network=zabbix-net \
+      -d zabbix/zabbix-server-mysql:alpine-6.0-latest
+
+docker logs zabbix-server-mysql
+
+
+docker run --name zabbix-web-nginx-mysql -t \
+      -e ZBX_SERVER_HOST="zabbix-server-mysql" \
+      -e DB_SERVER_HOST="mysql-server" \
+      -e MYSQL_DATABASE="zabbix" \
+      -e MYSQL_USER="zabbix" \
+      -e MYSQL_PASSWORD="zabbix_pwd" \
+      -e MYSQL_ROOT_PASSWORD="root_pwd" \
+      --network=zabbix-net \
+      -p 80:8080 \
+      --restart unless-stopped \
+      -d zabbix/zabbix-web-nginx-mysql:alpine-6.0-latest
+
+
+docker logs zabbix-web-nginx-mysql
+```
+It is important to verify that the zabbix-server-mysql log files show a successful evolve of the database to the 6.0 schema. 
