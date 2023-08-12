@@ -314,6 +314,33 @@ docker logs -f mysql-server
 
 ```
 Note: I created a docker volume to store the mysql data.  This way the data will persist if mysql needs to be upgraded. I copied the exported data from the old VM into the new containers, and then I logged into mysql and imported the data using the source command.  I show and describe command to verify the basic structure is correct. This data is still in 5.x format.  When 6.0 starts, it will notice that and evolve the data forward.
+
+Also note from the installation instructions, a global variable needs to be set before importing the zabbix database.
+```
+[jkozik@linode3 ~]$ docker exec -it mysql-server /bin/bash
+bash-4.4# mysql -uroot -proot_pwd
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 280267
+Server version: 8.0.34 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> SET GLOBAL log_bin_trust_function_creators = 1;
+Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+mysql> quit
+Bye
+bash-4.4# exit
+exit
+```
+
 ## Create zabbix containers: zabbix-java-gateway, zabbix-server-mysql, zabbix-web-nginx-mysql
 Following the zabbix installation documentation, create the zabbix containers.
 ```
