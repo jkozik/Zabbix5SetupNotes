@@ -382,3 +382,23 @@ docker run --name zabbix-web-nginx-mysql -t \
 docker logs zabbix-web-nginx-mysql
 ```
 It is important to verify that the zabbix-server-mysql log files show a successful evolve of the database to the 6.0 schema. 
+## Zabbix agent on zabbix server
+And finally on the same VM as the Zabbix server, install a zabbix agent to monitor the health of the server. 
+```
+docker run --name zabbix-agent -t \
+    --link zabbix-server-mysql:zabbix-server \
+    --network=zabbix-net \
+    --restart unless-stopped \
+    -e ZBX_HOSTNAME="Zabbix server" \
+    -d zabbix/zabbix-agent:centos-6.0-latest
+
+[jkozik@linode3 ~]$ docker container inspect zabbix-agent | grep IPAddress  # Get the IP Address of the zabbix-agent
+            "SecondaryIPAddresses": null,
+            "IPAddress": "",
+                    "IPAddress": "172.20.240.5",
+[jkozik@linode3 ~]$
+
+```
+Note: In the Zabbix web client, the IP address of the Zabbix server is found with the inspection command, see above.
+
+
