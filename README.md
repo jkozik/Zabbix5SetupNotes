@@ -106,6 +106,48 @@ My zabbix-server was complaining about swap space size.  Here's what I did to fi
 # free -h
 # vi /etc/fstab  # add "/newswap    swap    swap   defaults 0 0" at the bottom
 ```
+#### update on swap
+For linode 4, I did the swap a little differently:
+```
+[root@linode4 ~]# free -m
+              total        used        free      shared  buff/cache   available
+Mem:           1837        1115          68         128         653         428
+Swap:             0           0           0
+[root@linode4 ~]# fallocate -l 2G /swapfile
+[root@linode4 ~]# ls -lasth  /
+total 2.1G
+2.1G -rw-------.   1 root root 2.0G Nov  1 18:34 swapfile
+...
+[root@linode4 ~]# mkswap /swapfile
+Setting up swapspace version 1, size = 2097148 KiB
+no label, UUID=294c18ca-9e42-4d84-9703-6731411cca8a
+[root@linode4 ~]# swapon /swapfile
+[root@linode4 ~]# free-m
+-bash: free-m: command not found
+[root@linode4 ~]# free -m
+              total        used        free      shared  buff/cache   available
+Mem:           1837        1116          69         128         651         426
+Swap:          2047           0        2047
+[root@linode4 ~]# vi /etc/fstab    # add "/swapfile    swap    swap   defaults 0 0"
+[root@linode4 ~]# free -h
+              total        used        free      shared  buff/cache   available
+Mem:           1.8G        1.1G         67M        127M        652M        426M
+Swap:          2.0G        768K        2.0G
+[root@linode4 ~]# swapon -s
+Filename                                Type            Size    Used    Priority
+/swapfile                               file    2097148 768     -2
+[root@linode4 ~]# grep SwapTotal /proc/meminfo
+SwapTotal:       2097148 kB
+[root@linode4 ~]#
+```
+The following references helped:
+[Fixing Lack of Free Swap Space Error on Zabbix Server 4.2](https://youtube.com/watch?v=7QTN8DoT1aU)
+[How to increase the size of your swapfile](https://arcolinux.com/how-to-increase-the-size-of-your-swapfile/)
+[Create a Linux Swap File](https://linuxize.com/post/create-a-linux-swap-file/)
+
+
+
+
 ## Zabbix agent on another host, active mode
 On my home server install a zabbix-agent in active mode; that is, the zabbix-server waits for the agent to report to it.  No firewall ports need to be open. On my home LAN, this VM is 192.168.100.177. Running in a docker user account I did the following:
 ```
